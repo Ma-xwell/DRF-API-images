@@ -9,7 +9,6 @@ from .serializers import ImageSerializer, UploadImageSerializer, AccountTierSeri
 from .functions import create_image_with_new_dimensions
 
 class ImageView(generics.ListCreateAPIView):
-    current_time = datetime.datetime.now()
     
     def get_serializer_class(self):
         """
@@ -42,14 +41,19 @@ class ImageView(generics.ListCreateAPIView):
         """
         Lets logged user upload a new image
         """
+        current_time = datetime.datetime.now()
         user = self.request.user
         image = self.request.data['image']
         is_expirable = bool(self.request.data.get('generate_expiring_links', False))
         
         if is_expirable:
-            expiration_seconds = int(self.request.data['expiration_seconds_between_300_and_30000'])
-            if not 300 <= expiration_seconds <= 30000:
-                return Response({'expiration_seconds': 'Invalid value.'}, status=status.HTTP_400_BAD_REQUEST)
+            expiration_seconds = serializer.validated_data.get('expiration_seconds', None)
+
+            if expiration_seconds is not None:
+                expiration_seconds = int(expiration_seconds)
+                print(expiration_seconds)
+            if expiration_seconds is None:
+                is_expirable = False
         
         account_tier = User.objects.get(id=user.id).tier_type
         account_tier_serializer = AccountTierSerializer(account_tier)
@@ -66,7 +70,7 @@ class ImageView(generics.ListCreateAPIView):
             
             if is_expirable:
                 new_image_dict['expiration_seconds_between_300_and_30000'] = expiration_seconds, 
-                new_image_dict['expiration_date'] = self.current_time+datetime.timedelta(seconds=expiration_seconds)
+                new_image_dict['expiration_date'] = current_time+datetime.timedelta(seconds=expiration_seconds)
             
             new_images_list.append(new_image_dict)
         
@@ -77,12 +81,13 @@ class ImageView(generics.ListCreateAPIView):
             
             if is_expirable:
                 new_image_dict['expiration_seconds_between_300_and_30000'] = expiration_seconds
-                new_image_dict['expiration_date'] = self.current_time+datetime.timedelta(seconds=expiration_seconds)
+                new_image_dict['expiration_date'] = current_time+datetime.timedelta(seconds=expiration_seconds)
             
             new_images_list.append(new_image_dict)
             
         serializer = ImageSerializer(data=new_images_list, many=True)
-        if str(image).lower().endswith(('.jpg', '.png')) and user.is_authenticated and serializer.is_valid():    
+        #if str(image).lower().endswith(('.jpg', '.png')) and 
+        if user.is_authenticated and serializer.is_valid():    
             return serializer.save(user=user)
         
         return serializer
