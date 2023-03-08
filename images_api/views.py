@@ -2,7 +2,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
 from django.core.files.images import get_image_dimensions
-from django.core.exceptions import ValidationError
 import datetime
 
 from .models import User, Image, AccountTier
@@ -50,7 +49,7 @@ class ImageView(generics.ListCreateAPIView):
         if is_expirable:
             expiration_seconds = int(self.request.data['expiration_seconds_between_300_and_30000'])
             if not 300 <= expiration_seconds <= 30000:
-                raise ValidationError('Links can only expire in between 300 and 30000 seconds.')
+                return Response({'expiration_seconds': 'Invalid value.'}, status=status.HTTP_400_BAD_REQUEST)
         
         account_tier = User.objects.get(id=user.id).tier_type
         account_tier_serializer = AccountTierSerializer(account_tier)
@@ -121,5 +120,7 @@ class AccountTierApiView(APIView):
             if serializer_image_dimensions.is_valid():
                 serializer_image_dimensions.save()
                 return Response(serializer_image_dimensions.data, status=status.HTTP_201_CREATED)
+            
             return Response(serializer_image_dimensions.errors, status=status.HTTP_400_BAD_REQUEST)
+        
         return Response(serializer_account_tier.errors, status=status.HTTP_400_BAD_REQUEST)

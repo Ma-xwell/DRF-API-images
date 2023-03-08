@@ -1,0 +1,84 @@
+[
+    {
+      "model": "images_api.AccountTier",
+      "pk": 1,
+      "fields": {
+        "name": "Basic",
+        "generate_expiring_links": false,
+        "original_file_link_presence": false,
+        "description": "Basic tier"
+      }
+    },
+
+    {
+        "model": "images_api.AccountTier",
+        "pk": 2,
+        "fields": {
+          "name": "Premium",
+          "generate_expiring_links": false,
+          "original_file_link_presence": true,
+          "description": "Premium tier"
+        }
+      },
+
+      {
+        "model": "images_api.AccountTier",
+        "pk": 3,
+        "fields": {
+          "name": "Enterprise",
+          "generate_expiring_links": true,
+          "original_file_link_presence": true,
+          "description": "Enterprise tier"
+        }
+      },
+
+      {
+        "model": "images_api.ImageDimensions",
+        "pk": 1,
+        "fields": {
+          "height": 200,
+          "width": 0,
+          "tier_type": 1
+        }
+      },
+
+      {
+        "model": "images_api.ImageDimensions",
+        "pk": 2,
+        "fields": {
+          "height": 200,
+          "width": 0,
+          "tier_type": 2
+        }
+      },
+
+      {
+        "model": "images_api.ImageDimensions",
+        "pk": 3,
+        "fields": {
+          "height": 400,
+          "width": 0,
+          "tier_type": 2
+        }
+      },
+
+      {
+        "model": "images_api.ImageDimensions",
+        "pk": 4,
+        "fields": {
+          "height": 200,
+          "width": 0,
+          "tier_type": 3
+        }
+      },
+
+      {
+        "model": "images_api.ImageDimensions",
+        "pk": 5,
+        "fields": {
+          "height": 400,
+          "width": 0,
+          "tier_type": 3
+        }
+      }
+]
