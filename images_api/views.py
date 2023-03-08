@@ -1,38 +1,92 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import permissions
-from .models import Image, AccountTier
-from .serializers import ImageSerializer, AccountTierSerializer, ImageDimensionsSerializer
+from rest_framework import status, generics
+from django.core.files.images import get_image_dimensions
+from django.core.exceptions import ValidationError
+import datetime
 
-# Create your views here.
+from .models import User, Image, AccountTier
+from .serializers import ImageSerializer, UploadImageSerializer, AccountTierSerializer, ImageDimensionsSerializer
+from .functions import create_image_with_new_dimensions
 
-class ImageApiView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+class ImageView(generics.ListCreateAPIView):
+    current_time = datetime.datetime.now()
     
-    def get(self, request, *args, **kwargs):
+    def get_serializer_class(self):
         """
-        List all images of the user
+        When GET, show user the image links and their attributes. When POST, show only the ability to upload the image.
         """
+        if self.request.method == 'POST':    
+            return UploadImageSerializer
         
-        images = Image.objects.filter(user=request.user.id)
-        serializer = ImageSerializer(images, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return ImageSerializer
+        
+    def get_queryset(self):
+        """
+        Lists all of the logged user's images
+        """
+        user = self.request.user
+        
+        if user.is_authenticated:
+            images = Image.objects.filter(user=user)
+            
+            for image in images:
+                if image.is_expirable:
+                    if image.expired():
+                        image.delete()
+            
+            return images
+        
+        return Image.objects.none()
     
-    def post(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         """
-        Upload the image
+        Lets logged user upload a new image
         """
-        data = {
-            'image': request.data.get('image'),
-            'user': request.user.id
-        }
-        serializer = ImageSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = self.request.user
+        image = self.request.data['image']
+        is_expirable = bool(self.request.data.get('generate_expiring_links', False))
+        
+        if is_expirable:
+            expiration_seconds = int(self.request.data['expiration_seconds_between_300_and_30000'])
+            if not 300 <= expiration_seconds <= 30000:
+                raise ValidationError('Links can only expire in between 300 and 30000 seconds.')
+        
+        account_tier = User.objects.get(id=user.id).tier_type
+        account_tier_serializer = AccountTierSerializer(account_tier)
+        tier_possible_dimensions = account_tier_serializer['dimensions'].value
+        
+        new_images_list = []
+        
+        for dimension in tier_possible_dimensions:
+            image.seek(0)
+            width = dimension['width'] if not dimension['width'] == 0 else None
+            height = dimension['height']
+            new_image = create_image_with_new_dimensions(image, height, width)
+            new_image_dict = {'image': new_image, 'height': height, 'width': width, 'is_expirable': is_expirable}
+            
+            if is_expirable:
+                new_image_dict['expiration_seconds_between_300_and_30000'] = expiration_seconds, 
+                new_image_dict['expiration_date'] = self.current_time+datetime.timedelta(seconds=expiration_seconds)
+            
+            new_images_list.append(new_image_dict)
+        
+        if account_tier_serializer['original_file_link_presence'].value:
+            converted_image = create_image_with_new_dimensions(image)
+            converted_width, converted_height = get_image_dimensions(converted_image)
+            new_image_dict = {'image': converted_image, 'height': converted_height, 'width': converted_width, 'is_expirable': is_expirable}
+            
+            if is_expirable:
+                new_image_dict['expiration_seconds_between_300_and_30000'] = expiration_seconds
+                new_image_dict['expiration_date'] = self.current_time+datetime.timedelta(seconds=expiration_seconds)
+            
+            new_images_list.append(new_image_dict)
+            
+        serializer = ImageSerializer(data=new_images_list, many=True)
+        if str(image).lower().endswith(('.jpg', '.png')) and user.is_authenticated and serializer.is_valid():    
+            return serializer.save(user=user)
+        
+        return serializer
     
 class AccountTierApiView(APIView):
     def get(self, request, *args, **kwargs):

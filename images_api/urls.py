@@ -1,8 +1,8 @@
 from django.urls import path
 
-from .views import ImageApiView, AccountTierApiView
+from .views import AccountTierApiView, ImageView
 
 urlpatterns = [
-    path('api/image', ImageApiView.as_view()),
-    path('api/tier', AccountTierApiView.as_view()),
+    path('images', ImageView.as_view()),
+    path('tiers', AccountTierApiView.as_view())
 ]

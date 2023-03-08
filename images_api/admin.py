@@ -1,8 +1,7 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from .models import User, AccountTier, ImageDimensions, Image
 
-
-# Register your models here.
 
 class ImageDimensionsInline(admin.TabularInline):
     model = ImageDimensions
@@ -13,7 +12,14 @@ class AccountTierAdmin(admin.ModelAdmin):
     search_fields = ['name']
     inlines = [ImageDimensionsInline]
 
-admin.site.register(User)
+class CustomUserAdmin(UserAdmin):
+    list_display = ('username', 'first_name', 'last_name', 'email', 'tier_type')
+    UserAdmin.fieldsets += (
+        ('Tier', {'fields': ('tier_type',)}),
+    )
+    
+
+admin.site.register(User, CustomUserAdmin)
 admin.site.register(AccountTier, AccountTierAdmin)
 admin.site.register(ImageDimensions)
 admin.site.register(Image)
