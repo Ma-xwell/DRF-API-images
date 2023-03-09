@@ -2,10 +2,12 @@ from rest_framework import serializers
 from .models import Image, AccountTier, ImageDimensions
 from django.utils import timezone
 
+
 class ImageDimensionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageDimensions
         fields = ['height', 'width']
+        
         
 class AccountTierSerializer(serializers.ModelSerializer):
     dimensions = ImageDimensionsSerializer(many=True)
@@ -14,8 +16,8 @@ class AccountTierSerializer(serializers.ModelSerializer):
         model = AccountTier
         fields = '__all__'
         
+        
 class ImageSerializer(serializers.ModelSerializer):
-    
     def to_representation(self, instance):
         """
         Show width as "auto" if it was not fixed (automatically calculated based on height preserving the image ratio)
@@ -38,8 +40,8 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['image', 'height', 'width', 'is_expirable', 'expiration_date']
         
+        
 class UploadImageSerializer(serializers.ModelSerializer):
-    
     def __init__(self, *args, **kwargs):
         """
         Override __init__ to check if expiring links checkbox and expiration seconds field should be visible

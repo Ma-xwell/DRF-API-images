@@ -9,8 +9,8 @@ from .models import User, Image, AccountTier
 from .serializers import ImageSerializer, UploadImageSerializer, AccountTierSerializer, ImageDimensionsSerializer
 from .functions import create_image_with_new_dimensions
 
+
 class ImageView(generics.ListCreateAPIView):
-    
     def get_serializer_class(self):
         """
         When GET, show user the image links and their attributes. When POST, show only the ability to upload the image.
@@ -92,6 +92,7 @@ class ImageView(generics.ListCreateAPIView):
             return serializer.save(user=user)
         
         return serializer
+    
     
 class AccountTierApiView(APIView):
     def get(self, request, *args, **kwargs):

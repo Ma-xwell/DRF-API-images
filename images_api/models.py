@@ -3,9 +3,11 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
+
 def validate_image_extension(value):
     if not str(value.name).lower().endswith(('.png', '.jpg')):
         raise ValidationError('Unsupported file extension. Only PNG and JPG are allowed.')
+   
         
 class AccountTier(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -16,11 +18,13 @@ class AccountTier(models.Model):
     def __str__(self):
         return f'{self.name} tier.'
     
+    
 class User(AbstractUser):
     tier_type = models.ForeignKey(AccountTier, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f'User: {self.id}. Tier: {self.tier_type}.'
+
 
 class ImageDimensions(models.Model):
     height = models.PositiveIntegerField()
@@ -30,6 +34,7 @@ class ImageDimensions(models.Model):
     def __str__(self):
         width_str = "auto" if self.width is None else str(self.width)
         return f'Height: {self.height}; width: {width_str}; tier: {self.tier_type}.'
+
 
 class Image(models.Model):
     image = models.ImageField(upload_to='images_api/media/images/', validators=[validate_image_extension])
