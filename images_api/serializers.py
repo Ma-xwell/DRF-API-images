@@ -17,6 +17,9 @@ class AccountTierSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
+        """
+        Show width as "auto" if it was not fixed (automatically calculated based on height preserving the image ratio)
+        """
         width = instance.width
         expiration_date = instance.expiration_date
         
@@ -38,6 +41,9 @@ class ImageSerializer(serializers.ModelSerializer):
 class UploadImageSerializer(serializers.ModelSerializer):
     
     def __init__(self, *args, **kwargs):
+        """
+        Override __init__ to check if expiring links checkbox and expiration seconds field should be visible
+        """
         user = kwargs['context']['request'].user
         super().__init__(*args, **kwargs)
         
@@ -47,6 +53,9 @@ class UploadImageSerializer(serializers.ModelSerializer):
                 self.fields['expiration_seconds_between_300_and_30000'] = serializers.IntegerField(source='expiration_seconds', required=False)
     
     def validate(self, data):
+        """
+        Validators for expiring links checkbox and expiration seconds field
+        """
         user = self.context.get('request').user
         if user.is_authenticated and user.tier_type.original_file_link_presence and user.tier_type.generate_expiring_links:
             expiration_seconds = data.get('expiration_seconds')
