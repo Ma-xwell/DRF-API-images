@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Image, AccountTier, ImageDimensions
+from django.utils import timezone
 
 class ImageDimensionsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +23,7 @@ class ImageSerializer(serializers.ModelSerializer):
         if width is None or width == 0:
             width = 'auto'
             
-        expiration_date = 'N/A' if expiration_date is None else expiration_date.strftime('%B %d, %Y - %H:%M:%S')
+        expiration_date = 'N/A' if expiration_date is None else timezone.localtime(expiration_date).strftime('%B %d, %Y - %H:%M:%S')
         
         data = super().to_representation(instance)
         data['width'] = width
@@ -49,7 +50,6 @@ class UploadImageSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_authenticated and user.tier_type.original_file_link_presence and user.tier_type.generate_expiring_links:
             expiration_seconds = data.get('expiration_seconds')
-            print(data)
             is_expiring = data.get('user').get('tier_type').get('generate_expiring_links')
             
             if not is_expiring and expiration_seconds:

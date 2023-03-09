@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from django.core.files.images import get_image_dimensions
 import datetime
+from django.utils import timezone
 
 from .models import User, Image, AccountTier
 from .serializers import ImageSerializer, UploadImageSerializer, AccountTierSerializer, ImageDimensionsSerializer
@@ -17,12 +18,6 @@ class ImageView(generics.ListCreateAPIView):
         if self.request.method == 'POST':    
             return UploadImageSerializer
         
-        return ImageSerializer
-        
-    def get_queryset(self):
-        """
-        Lists all of the logged user's images
-        """
         user = self.request.user
         
         if user.is_authenticated:
@@ -32,8 +27,16 @@ class ImageView(generics.ListCreateAPIView):
                 if image.is_expirable:
                     if image.expired():
                         image.delete()
-            
-            return images
+        return ImageSerializer
+        
+    def get_queryset(self):
+        """
+        Lists all of the logged user's images
+        """
+        user = self.request.user
+        
+        if user.is_authenticated:
+            return Image.objects.filter(user=user)
         
         return Image.objects.none()
     
@@ -41,7 +44,7 @@ class ImageView(generics.ListCreateAPIView):
         """
         Lets logged user upload a new image
         """
-        current_time = datetime.datetime.now()
+        current_time = timezone.localtime(timezone.now())
         user = self.request.user
         image = self.request.data['image']
         is_expirable = bool(self.request.data.get('generate_expiring_links', False))
@@ -51,7 +54,6 @@ class ImageView(generics.ListCreateAPIView):
 
             if expiration_seconds is not None:
                 expiration_seconds = int(expiration_seconds)
-                print(expiration_seconds)
             if expiration_seconds is None:
                 is_expirable = False
         
@@ -86,8 +88,7 @@ class ImageView(generics.ListCreateAPIView):
             new_images_list.append(new_image_dict)
             
         serializer = ImageSerializer(data=new_images_list, many=True)
-        #if str(image).lower().endswith(('.jpg', '.png')) and 
-        if user.is_authenticated and serializer.is_valid():    
+        if user.is_authenticated and serializer.is_valid():
             return serializer.save(user=user)
         
         return serializer
