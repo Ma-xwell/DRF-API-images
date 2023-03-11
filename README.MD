@@ -2,6 +2,7 @@
 ## Recruitment task for Backend (Python + Django) Engineer position
 ### Cezary Suwiński - 11 March 2023
 
+**Demo video: coming soon**
  &nbsp; 
 
 **How to run the project**
@@ -14,4 +15,21 @@
 7. Each tier can be modified, as well as new ones can be created. As an admin, you can specify if newly created tier should have expirable links available, presence of the link to the originally uploaded file but also you can set arbitrary thumbnail sizes. When setting arbitrary thumbnail sizes, height should be always provided. Width is optional - if you will set width to 0 *(zero)*, it will be automatically calculated based on height without losing image's ratio. However, you can set width to any positive integer you want.
 *remember: newly created user has not tier allocated by default. Do it, otherwise user will not be able to upload any images to the page!*
 8. As a logged user, navigate to */images_api/images/* and upload your first image.
-9. After successful upload, click on **Images** at the top of the DRF UI, this will show you GET request, listing all the images that currently logged user has uploaded along with their attributes such as height, width, information if image is expirable and if it is, the date and time of expiration.
+9. After successful upload, click on **Image** at the top of the DRF UI, this will show you GET request, listing all the images that currently logged user has uploaded along with their attributes such as height, width, information if image is expirable and if it is, the date and time of expiration.
+
+
+## Quick look at the DRF UI
+
+**POST request** - uploading new image with expiring link set for 300 seconds (5 minutes)
+
+&nbsp; 
+
+![](readme_media/POST.jpg)
+
+&nbsp; 
+
+**GET request** - listing all the user's images with their attributes
+
+&nbsp; 
+
+![](readme_media/GET.jpg)
