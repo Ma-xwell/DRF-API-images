@@ -3,7 +3,11 @@ version: '3'
 services:
   web:
     build: .
-    command: python3 manage.py runserver 0.0.0.0:8000
+    command: 
+      sh -c "python3 manage.py makemigrations &&
+             python3 manage.py migrate &&
+             python3 manage.py loaddata images_api/fixtures/tiers.json &&
+             python3 manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     volumes:
