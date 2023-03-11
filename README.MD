@@ -9,7 +9,7 @@
 1. Go to your terminal window, go to the desired directory and run ```git clone https://github.com/Ma-xwell/DRF-API-images.git``` in your terminal
 2. After successful cloning, run ```docker compose up``` in your terminal while being in the root directory (top *hexocean* directory). This might take a while.
 3. You can click CTRL+C and run ```python manage.py createsuperuser``` in your terminal and follow the instructions
-4. Again, run ```docker compose up``` and navigate to */admin/* route on the website
+4. Again, run ```docker compose up```, click on the link prompted in the terminal and navigate to */admin/* route on the website after opening it
 5. Log In using credentials you have provided in step **3.**
 6. Now you can create new Users. After creating any, click on them and assign them to any tier (there are three built-in tiers: Basic, Premium, Enterprise)
 7. Each tier can be modified, as well as new ones can be created. As an admin, you can specify if newly created tier should have expirable links available, presence of the link to the originally uploaded file but also you can set arbitrary thumbnail sizes. When setting arbitrary thumbnail sizes, height should be always provided. Width is optional - if you will set width to 0 *(zero)*, it will be automatically calculated based on height without losing image's ratio. However, you can set width to any positive integer you want.
