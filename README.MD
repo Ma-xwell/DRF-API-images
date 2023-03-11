@@ -2,8 +2,13 @@
 ## Recruitment task for Backend (Python + Django) Engineer position
 ### Cezary Suwiński - 11 March 2023
 
+&nbsp; 
+
+**Completion time: ca. 12-16H with educating**
+
 **Demo video: coming soon**
- &nbsp; 
+
+&nbsp; 
 
 **How to run the project**
 1. Go to your terminal window, go to the desired directory and run ```git clone https://github.com/Ma-xwell/DRF-API-images.git``` in your terminal
