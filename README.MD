@@ -1,6 +1,6 @@
 # HEXOCEAN
 ## Recruitment task for Backend (Python + Django) Engineer position
-### Cezary Suwiński - 11 March 2023
+### Cezary Suwiński - 12 March 2023
 
 &nbsp; 
 
