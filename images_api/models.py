@@ -23,7 +23,7 @@ class User(AbstractUser):
     tier_type = models.ForeignKey(AccountTier, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f'User: {self.id}. Tier: {self.tier_type}.'
+        return f'User: {self.id}. {self.tier_type}.'
 
 
 class ImageDimensions(models.Model):
