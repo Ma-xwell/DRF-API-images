@@ -1,7 +1,8 @@
 from rest_framework import generics
 from django.core.files.images import get_image_dimensions
-import datetime
 from django.utils import timezone
+import datetime
+import os
 
 from .models import User, Image
 from .serializers import ImageSerializer, UploadImageSerializer, AccountTierSerializer
@@ -24,7 +25,11 @@ class ImageView(generics.ListCreateAPIView):
             for image in images:
                 if image.is_expirable:
                     if image.expired():
+                        image_path = str(image.image)
+                        image_path.replace('images_api/', '', 1) # removing 'images_api/' from path so image will be deletable from here (from images_api directory)
+                        os.remove(image_path)
                         image.delete()
+                        
         return ImageSerializer
         
     def get_queryset(self):
