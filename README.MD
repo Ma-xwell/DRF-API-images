@@ -6,7 +6,7 @@
 
 **Completion time: ca. 12-16H with educating**
 
-**Demo video: coming soon**
+**Demo video: https://www.youtube.com/watch?v=bt4_aPU8hHU**
 
 &nbsp; 
 
